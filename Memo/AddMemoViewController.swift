@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import NCMB
 
 class AddMemoViewController: UIViewController {
     
@@ -50,7 +51,17 @@ class AddMemoViewController: UIViewController {
         }
         ud.synchronize()
         self.dismiss(animated: true, completion: nil)
-        //print(inputText!)
+        
+        let object = NCMBObject(className: "Memo")
+        object?.setObject(inputText, forKey: "text")
+        object?.saveInBackground({ (error) in
+            if error != nil{
+                print("error")
+            }
+            else{
+                print("sucsess")
+            }
+        })
     }
     /*
     // MARK: - Navigation

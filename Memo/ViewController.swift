@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import MCSwipeTableViewCell
+import NCMB
 
 class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
