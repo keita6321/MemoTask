@@ -12,7 +12,7 @@ import NCMB
 class AddMemoViewController: UIViewController {
     
     @IBOutlet var memoTextView: UITextView!
-    
+    @IBOutlet var memoTextFireld: UITextField!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,7 +26,7 @@ class AddMemoViewController: UIViewController {
     }
     
 
-    @IBAction func save(){
+    @IBAction func saveMemo(){
         let inputText = memoTextView.text
         let ud = UserDefaults.standard
         if ud.array(forKey: KeyManager.saveKey) != nil {
@@ -51,10 +51,10 @@ class AddMemoViewController: UIViewController {
         }
         ud.synchronize()
         self.dismiss(animated: true, completion: nil)
-        
-        let object = NCMBObject(className: "Memo")
-        object?.setObject(inputText, forKey: "text")
-        object?.saveInBackground({ (error) in
+        //niftyに投げる
+        let object = NCMBObject(className: "Memo")//インデクスの指定
+        object?.setObject(inputText, forKey: "text")//フィールドの指定
+        object?.saveInBackground({ (error) in//動的保存
             if error != nil{
                 print("error")
             }
@@ -63,6 +63,69 @@ class AddMemoViewController: UIViewController {
             }
         })
     }
+    
+    @IBAction func loadMemo(){
+        let query = NCMBQuery(className: "Memo")
+        query?.whereKey("text", equalTo: "わはは")//検索対象のフィールドと一致させるテキストを指定
+        query?.findObjectsInBackground({ (result, error) in//取れるのは配列
+            if error != nil{
+                print("error")
+            }
+            else{
+                //print(result)
+                let memo = result as! [NCMBObject]
+                print(memo)
+                let text = memo.last?.object(forKey: "text") as! String
+                self.memoTextView.text = text
+            }
+        })
+    }
+    
+    @IBAction func updateMemo(){
+        let query = NCMBQuery(className: "Memo")
+        query?.whereKey("text", equalTo: "わはは")//指定のフィールドの値を検索条件にする
+        query?.findObjectsInBackground({ (result, error) in//あらかじめ決めた検索条件でデータを配列で取得
+        if error != nil{
+            print(error)
+        }
+        else{
+            let memo = result as! [NCMBObject]
+            let textObject = memo.first//取得した配列の頭を保存
+            textObject?.setObject("つも", forKey: "text")
+            textObject?.saveInBackground({ (error) in
+                if error != nil{
+                    print(error)
+                }
+                else{
+                    print("Update sucsess")
+                }
+            })
+        }
+    })
+    }
+    
+    @IBAction func deleteMemo(){
+        let query = NCMBQuery(className: "Memo")
+        query?.whereKey("text", equalTo: "てすと")
+        query?.findObjectsInBackground({ (result, error) in
+            if error != nil{
+                print(error)
+            }
+            else{
+             let memo = result as! [NCMBObject]
+                let textObject = memo.first
+                textObject?.deleteInBackground({ (error) in
+                    if error != nil{
+                        print(error)
+                    }
+                    else{
+                        print("delete sucsess")
+                    }
+                })
+            }
+        })
+    }
+    
     /*
     // MARK: - Navigation
 
