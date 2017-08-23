@@ -23,7 +23,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
 
     override func viewWillAppear(_ animated: Bool) {
-        loadMemo()
+        loadAllMemo()
     }
     
     override func didReceiveMemoryWarning() {
@@ -36,6 +36,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         return memoArray.count
     }
     
+    //memoArrayのindex数に応じてセルを生成
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "MemoCell")!
         cell.textLabel?.text = memoArray[indexPath.row]
@@ -69,13 +70,34 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         }
     }
     
+    @IBAction func loadAllMemo(){
+        var i=0
+        self.memoArray.removeAll()
+        let query = NCMBQuery(className: "Memo")
+        query?.findObjectsInBackground({ (result, error) in//もしデータが取れたなら（取れるのは配列）
+            if error != nil{
+                print("error")
+            }
+            else{
+                //print(result)
+                let memo = result as! [NCMBObject]
+                while(i != memo.count){
+                    //var text = memo.first?.object(forKey: "text") as! String
+                    self.memoArray.append(memo[i].object(forKey: "text") as! String)
+                    i += 1
+                }
+            }
+            self.memoTableView.reloadData()//
+        })
+        
+    }
+    
     func loadMemo(){
         let ud = UserDefaults.standard
         if ud.array(forKey: KeyManager.saveKey) != nil {
             memoArray = ud.array(forKey: KeyManager.saveKey) as! [String]
             memoTableView.reloadData()
         }
-    }
-    
+}
 }
 

@@ -106,7 +106,7 @@ class AddMemoViewController: UIViewController {
     
     @IBAction func deleteMemo(){
         let query = NCMBQuery(className: "Memo")
-        query?.whereKey("text", equalTo: "てすと")
+        //query?.whereKey("text", equalTo: "てすと")
         query?.findObjectsInBackground({ (result, error) in
             if error != nil{
                 print(error)
